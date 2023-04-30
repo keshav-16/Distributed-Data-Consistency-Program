@@ -1,0 +1,98 @@
+import socket
+import subprocess
+import os
+
+# Create a socket object
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Define the IP address and port number of the server
+#server_address = ('127.0.0.1', 9090)
+host = '127.0.0.1'
+port = 9099
+
+# Bind the socket to the server address
+server_socket.bind((host,port))
+
+# Listen for incoming connections
+server_socket.listen(1)
+print("TCP server has started and is ready to receive")
+
+# Accept the client connection
+client_socket, client_address = server_socket.accept()
+print("connected ",client_address[0],client_address[1])
+
+# Receive the file contents from the client
+print('File started recieving ...')
+
+# Receive the file name and size from the client
+file_name, file_size = client_socket.recv(1024).decode().split(',')
+
+# Convert the file size to an integer
+file_size = int(file_size)
+
+# Receive the file contents from the client
+received_size = 0
+with open('file_name.txt', 'wb+') as file:
+    while received_size < file_size:
+        data = client_socket.recv(1024)
+        received_size += len(data)
+        file.write(data)
+print('File recieved ...')
+
+# Execute Python code with the file sent
+process = os.system('python3 main.py file_name.txt')
+print(process)
+
+# Get the output from the executed Python code
+#output, error = process.communicate()
+
+# Send the processed output back to the client
+client_socket.send(str(process).encode())
+print('File sent ..')
+
+# Close the socket connections
+client_socket.close()
+server_socket.close()
+
+
+import socket
+import subprocess
+import os
+
+# Create a socket object
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Define the IP address and port number of the server
+server_address = ('127.0.0.1', 9090)
+host = '127.0.0.1'
+port = 9099
+
+# Connect to the server
+client_socket.connect((host,port))
+
+# Specify the file to be sent
+file_name = 'test_1.txt'
+
+# Get the size of the file
+file_size = os.path.getsize(file_name)
+
+# Send the file name and size to the server
+client_socket.send(f"{file_name},{file_size}".encode())
+
+# Send the file contents to the server
+with open(file_name, 'rb') as file:
+    data = file.read(1024)
+    while data:
+        client_socket.send(data)
+        data = file.read(1024)
+print('File sent ...')
+
+# Receive the processed output from the server
+received_data = client_socket.recv(1024)
+print('File recieved...')
+
+# Decode the received data and print it to the console
+print(received_data.decode())
+
+# Close the socket connection
+client_socket.close()
