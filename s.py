@@ -48,6 +48,11 @@ process = os.popen('python3 main.py file_name.txt').read()
 # Send the processed output back to the client
 client_socket.send(process.encode())
 print('Data Sent ..')
+print('\n')
+print('----TABLE----')
+print('\n')
+process = os.system('python3 new.py file_name.txt')
+print('\n')
 
 # Close the socket connections
 client_socket.close()
