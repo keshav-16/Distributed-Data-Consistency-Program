@@ -12,7 +12,7 @@ host = '127.0.0.1'
 port = 9099
 
 # Connect to the server
-client_socket.connect((host,port))
+client_socket.connect(server_address)
 
 # Specify the file to be sent
 file_name = sys.argv[1]
